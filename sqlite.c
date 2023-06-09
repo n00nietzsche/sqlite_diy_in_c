@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 /*** 매크로 정의 ***/
 #define TABLE_MAX_PAGES 100
@@ -63,6 +64,7 @@ typedef struct
 } Table;
 
 /*** 상수 정의 ***/
+// ROW 의 사이즈 계산 등에 필요한 상수들
 const __uint32_t ID_SIZE = size_of_attribute(Row, id);
 const __uint32_t USERNAME_SIZE = size_of_attribute(Row, username);
 const __uint32_t EMAIL_SIZE = size_of_attribute(Row, email);
@@ -70,13 +72,13 @@ const __uint32_t ID_OFFSET = 0;
 const __uint32_t USERNAME_OFFSET = ID_OFFSET + ID_SIZE;
 const __uint32_t EMAIL_OFFSET = USERNAME_OFFSET + USERNAME_SIZE;
 const __uint32_t ROW_SIZE = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE;
-
+// 테이블 페이지 계산 등에 필요한 상수들
 const __uint32_t PAGE_SIZE = 4096;
 const __uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
 const __uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 /*** 함수 정의 ***/
-
+// 새로운 테이블을 만드는 함수 (초기엔 페이지별 메모리할당 되지 않음)
 Table *new_table()
 {
   Table *table = (Table *)malloc(sizeof(Table));
@@ -90,6 +92,7 @@ Table *new_table()
   return table;
 }
 
+// 테이블 메모리 해제하기
 void free_table(Table *table)
 {
   for (int i = 0; table->pages[i]; i++)
@@ -100,15 +103,16 @@ void free_table(Table *table)
   free(table);
 }
 
-// 우리가 어느 위치의 메모리를 읽어야할지 혹은 써야할지 찾아준다.
+// 테이블에서 해당하는 번호의 행이 위치한 곳을 찾아준다
 void *row_slot(Table *table, __uint32_t row_num)
 {
+  // 페이지 번호 계산하기
   __uint32_t page_num = row_num / ROWS_PER_PAGE;
   void *page = table->pages[page_num];
 
+  // 페이지가 아직 사용된 적 없다면 (NULL 이라면) 메모리 할당하기
   if (page == NULL)
   {
-    // 페이지에 접근하려 할 때만 메모리 할당하기
     page = table->pages[page_num] = malloc(PAGE_SIZE);
   }
 
