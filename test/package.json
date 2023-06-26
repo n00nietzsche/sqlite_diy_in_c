@@ -4,11 +4,14 @@
   "description": "",
   "main": "cli_test.js",
   "scripts": {
-    "test": "mocha test.js"
+    "test": "mocha minimal_mocha_test.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "mocha": "^10.2.0"
+  },
+  "dependencies": {
+    "chai": "^4.3.7"
   }
 }
