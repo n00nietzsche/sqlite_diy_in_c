@@ -1,7 +1,5 @@
 const { spawn } = require("child_process");
-const cliProcess = spawn(
-  "/mnt/c/Users/jks/Desktop/study/sqlite_diy_in_c/sqlite"
-);
+const cliProcess = spawn("./../../sqlite");
 function sendCommand(command) {
   cliProcess.stdin.write(command);
 }
